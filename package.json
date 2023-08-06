@@ -1,0 +1,18 @@
+{
+  "name": "gamewiper",
+  "version": "1.0.0",
+  "description": "A utility to detect and remove installed games from various platforms.",
+  "main": "src/main/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^25.4.0"
+  },
+  "dependencies": {
+    "fast-folder-size": "^2.1.0"
+  }
+}

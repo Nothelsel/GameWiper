@@ -1,0 +1,86 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.app-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    background-color: #ffffff;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    margin: 0.5rem 0;
+    border: 1px solid #e1e1e1;
+    border-radius: 5px;
+    background-color: #fafafa;
+}
+
+button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+button svg {
+    width: 20px;
+    height: 20px;
+    fill: red;
+}
+
+
+.app-container {
+    font-family: Arial, sans-serif;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.game-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    justify-content: center;
+}
+
+.game-card span {
+    flex: 1;
+}
+
+
+.folder-btn, .delete-btn {
+    margin-left: 10px; /* Espace entre les boutons */
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    transition: 0.3s opacity;
+}
+
+.folder-btn:hover, .delete-btn:hover {
+    opacity: 0.7;
+}
