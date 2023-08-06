@@ -3,66 +3,115 @@ const path = require('path');
 
 const gamesFilePath = path.join(__dirname, '../../data/games.json');
 
-window.onload = function () {
-    const gameListSection = document.getElementById('games-list');
+window.onload = function() {
+    loadGamesAndDisplay();
+    setupSortingHandlers();
+};
 
-    let games;
+function loadGamesAndDisplay() {
+    const games = loadGamesFromFile();
+    if (!games) return;
+    displayGames(games);
+}
+
+function loadGamesFromFile() {
     try {
-        games = JSON.parse(fs.readFileSync(gamesFilePath, 'utf-8'));
+        return JSON.parse(fs.readFileSync(gamesFilePath, 'utf-8'));
     } catch (err) {
         console.error('Erreur lors de la lecture du fichier games.json:', err);
-        return;
+        return null;
     }
+}
 
+function displayGames(games) {
+    const gameListSection = document.getElementById('games-list');
+    // Supprimez d'abord tous les éléments existants
+    while (gameListSection.firstChild) {
+        gameListSection.removeChild(gameListSection.firstChild);
+    }
+    // Puis ajoutez les éléments triés
     games.forEach(game => {
-        const gameItem = document.createElement('li');
-        gameItem.classList.add('game-card');
-
-        const gameName = document.createElement('span');
-        gameName.textContent = game.name;
-        gameItem.appendChild(gameName);
-
-        const gameSize = document.createElement('span');
-        gameSize.textContent = `${game.size} Go`;
-        gameItem.appendChild(gameSize);
-
-        const deleteBtn = document.createElement('img');
-        deleteBtn.src = path.join(__dirname, '../../assets/img/delete.svg');
-        deleteBtn.alt = 'Supprimer';
-        deleteBtn.classList.add('delete-btn');
-        deleteBtn.onclick = function () {
-            if (confirm('Voulez-vous vraiment supprimer ce jeu ?')) {
-                // Supprimer le jeu de la liste
-                const index = games.indexOf(game);
-                games.splice(index, 1);
-
-                // Enregistrer la nouvelle liste dans le fichier games.json
-                fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 4));
-
-                // Actualiser la liste des jeux
-                gameListSection.removeChild(gameItem);
-            }
-        };
-
-        const folderBtn = document.createElement('img');
-        folderBtn.src = path.join(__dirname, '../../assets/img/folder.svg');
-        folderBtn.alt = 'Ouvrir le dossier';
-        folderBtn.classList.add('folder-btn');
-        folderBtn.onclick = function () {
-            const { shell } = require('electron');
-            const gamePath = game.path;
-
-            if (fs.existsSync(gamePath)) {
-                shell.openPath(gamePath);
-            } else {
-                alert('Le chemin du dossier du jeu est introuvable.');
-            }
-        }
-
-        gameItem.appendChild(folderBtn);
-        gameItem.appendChild(deleteBtn);
-
-        gameListSection.appendChild(gameItem);
-
+        const gameItem = createGameListItem(game);
+        appendToGameList(gameItem);
     });
-};
+}
+
+function createGameListItem(game) {
+    const gameItem = document.createElement('li');
+    gameItem.classList.add('game-card');
+
+    gameItem.appendChild(createGameNameElement(game.name));
+    gameItem.appendChild(createGameSizeElement(game.size));
+    gameItem.appendChild(createButton('../../assets/img/folder.svg', 'Ouvrir le dossier', 'folder-btn', () => openGameFolder(game.path)));
+    gameItem.appendChild(createButton('../../assets/img/delete.svg', 'Supprimer', 'delete-btn', () => handleGameDeletion(game)));
+
+    return gameItem;
+}
+
+function createGameNameElement(name) {
+    const gameName = document.createElement('span');
+    gameName.textContent = name;
+    return gameName;
+}
+
+function createGameSizeElement(size) {
+    const gameSize = document.createElement('span');
+    gameSize.textContent = `${size} Go`;
+    return gameSize;
+}
+
+function createButton(src, alt, className, action) {
+    const btn = document.createElement('img');
+    btn.src = path.join(__dirname, src);
+    btn.alt = alt;
+    btn.classList.add(className);
+    btn.onclick = action;
+    return btn;
+}
+
+function handleGameDeletion(game) {
+    if (!confirm('Voulez-vous vraiment supprimer ce jeu ?')) return;
+
+    const games = loadGamesFromFile();
+    const index = games.indexOf(game);
+    games.splice(index, 1);
+    fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 4));
+    displayGames(games);  // Remise à jour de l'affichage après suppression
+}
+
+function openGameFolder(gamePath) {
+    const { shell } = require('electron');
+
+    if (fs.existsSync(gamePath)) {
+        shell.openPath(gamePath);
+    } else {
+        alert('Le chemin du dossier du jeu est introuvable.');
+    }
+}
+
+function appendToGameList(gameItem) {
+    const gameListSection = document.getElementById('games-list');
+    gameListSection.appendChild(gameItem);
+}
+
+function setupSortingHandlers() {
+    const games = loadGamesFromFile();
+
+    document.getElementById('sort-by-name').addEventListener('click', () => {
+        sortGamesByName(games);
+        displayGames(games);
+    });
+
+    document.getElementById('sort-by-size').addEventListener('click', () => {
+        sortGamesBySize(games);
+        displayGames(games);
+    });
+}
+
+function sortGamesByName(games) {
+    games.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function sortGamesBySize(games) {
+    games.sort((a, b) => b.size - a.size);
+}
