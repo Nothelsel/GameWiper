@@ -6,6 +6,10 @@ const gamesFilePath = path.join(__dirname, '../../data/games.json');
 const gameDirectories = [
     'C:\\Program Files (x86)\\Steam\\steamapps\\common',
     // Ajoutez d'autres répertoires comme ceux d'Epic Games, GOG, etc.
+    'C:\\Program Files (x86)\\Ubisoft\\Ubisoft Game Launcher\\games',
+    'C:\\Program Files (x86)\\Origin Games',
+    'C:\\Program Files (x86)\\Bethesda.net Launcher\\games',
+    'C:\\Program Files (x86)\\Battle.net\\Games',
 ];
 
 function getDirectorySize(directory) {
