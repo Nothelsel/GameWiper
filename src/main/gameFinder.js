@@ -15,11 +15,11 @@ const gameDirectories = [
 function getDirectorySize(directory) {
     const fileList = fs.readdirSync(directory);
     let directorySize = 0;
-
+    console.log(`Calculating size of ${directory}...`);
     fileList.forEach(file => {
         const filePath = path.join(directory, file);
         const fileStats = fs.statSync(filePath);
-
+        console.log(`Found ${fileStats.size} bytes in ${filePath}`);
         if (fileStats.isDirectory()) {
             directorySize += getDirectorySize(filePath);  // recursive call
         } else {

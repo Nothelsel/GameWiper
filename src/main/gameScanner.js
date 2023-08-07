@@ -8,71 +8,65 @@ const gameDirectoriesNames = [
     'Origin Games',
     'Bethesda.net Launcher\\games',
     'Battle.net\\Games',
-    // Ajoutez d'autres noms de répertoire de jeux au besoin.
+    'Epic Games',
+    'GOG Galaxy\\Games',
+    'Rockstar Games\\Launcher\\games',
+    'Minecraft Launcher\\game',
 ];
 
 function findGameDirectories(startPath) {
-    let gamePaths = [];
+    return new Promise((resolve) => {
+        let gamePaths = [];
 
-    if (!fs.existsSync(startPath)) {
-        return gamePaths;
-    }
-
-    let files = [];
-    try {
-        files = fs.readdirSync(startPath);
-    } catch (err) {
-        console.error(`Erreur lors de la lecture du répertoire ${startPath}: ${err.message}`);
-        return gamePaths;
-    }
-
-    for (let file of files) {
-        const curPath = path.join(startPath, file);
-
-        let isDirectory = false;
         try {
-            isDirectory = fs.lstatSync(curPath).isDirectory();
-        } catch (err) {
-            console.error(`Erreur lors de l'accès au chemin ${curPath}: ${err.message}`);
-            continue;  // Passez à la prochaine itération
-        }
-
-        if (isDirectory) {
-            if (gameDirectoriesNames.some(dirName => curPath.endsWith(dirName))) {
-                gamePaths.push(curPath);
+            if (!fs.existsSync(startPath)) {
+                resolve(gamePaths);
             }
-            gamePaths = gamePaths.concat(findGameDirectories(curPath));
-        }
-    }
 
-    return gamePaths;
+            for (let gameDir of gameDirectoriesNames) {
+                const fullPath = path.join(startPath, gameDir);
+                if (fs.existsSync(fullPath)) {
+                    gamePaths.push(fullPath);
+                }
+            }
+
+            resolve(gamePaths);
+        } catch (err) {
+            console.error(`Erreur lors de la recherche dans ${startPath}: ${err.message}`);
+            resolve([]);  // En cas d'erreur, renvoyez une liste vide.
+        }
+    });
 }
 
-function getAllTargetDirectories() {
-    const targetDirs = ['Program Files', 'Program Files (x86)'];
-    
-    // Ceci fonctionne principalement sur Windows car il liste les lecteurs comme C:, D:, etc.
-    let drives = [];
+function getAllProgramFilesDirectories() {
+    // Renvoie les répertoires Program Files des lecteurs existants
+    let directories = [];
     for (let i = 65; i <= 90; i++) {
         const drive = String.fromCharCode(i) + ":\\";
-        if (fs.existsSync(drive)) {
-            targetDirs.forEach(dir => {
-                const fullPath = path.join(drive, dir);
-                if (fs.existsSync(fullPath)) {
-                    drives.push(fullPath);
-                }
-            });
+        try {
+            if (fs.existsSync(drive)) {
+                directories.push(path.join(drive, 'Program Files'));
+                directories.push(path.join(drive, 'Program Files (x86)'));
+            }
+        } catch (err) {
+            console.error(`Erreur lors de la vérification du lecteur ${drive}: ${err.message}`);
         }
     }
-    return drives;
+    return directories;
 }
 
-function findAllGameFolders() {
-    const targetDirectories = getAllTargetDirectories();
-    let allGameDirs = [];
+async function findAllGameFolders() {
+    const programFilesDirs = getAllProgramFilesDirectories();
+    let allPromises = programFilesDirs.map(dir => findGameDirectories(dir));
 
-    for (let dir of targetDirectories) {
-        allGameDirs = allGameDirs.concat(findGameDirectories(dir));
+    let allGameDirs = [];
+    try {
+        const results = await Promise.all(allPromises);
+        results.forEach(result => {
+            allGameDirs = allGameDirs.concat(result);
+        });
+    } catch (err) {
+        console.error(`Erreur lors de la recherche des dossiers de jeux: ${err.message}`);
     }
 
     return allGameDirs;
