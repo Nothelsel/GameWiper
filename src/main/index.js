@@ -1,7 +1,7 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const gameFinder = require('./gameFinder');
-const findAllGameFolders = require('./gameScanner');
+const findAllGameFolders = require('./folderScanner');
 
 let mainWindow;
 

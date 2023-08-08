@@ -1,7 +1,9 @@
 const fs = require('fs');
 const path = require('path');
+import LogService from '../services/logService';
 
 const gamesFilePath = path.join(__dirname, '../../data/games.json');
+
 
 const gameDirectories = [
     'C:\\Program Files (x86)\\Steam\\steamapps\\common',
@@ -12,19 +14,22 @@ const gameDirectories = [
     'C:\\Program Files (x86)\\Battle.net\\Games',
 ];
 
-function getDirectorySize(directory) {
+function getDirectorySize(directory,logger) {
     const fileList = fs.readdirSync(directory);
     let directorySize = 0;
-    console.log(`Calculating size of ${directory}...`);
+    logger.logToFile(`Calculating size of ${directory}...`);
     fileList.forEach(file => {
         const filePath = path.join(directory, file);
         const fileStats = fs.statSync(filePath);
-        console.log(`Found ${fileStats.size} bytes in ${filePath}`);
+
+        
+        logger.logToFile(`Found ${fileStats.size} bytes in ${filePath}`);
         if (fileStats.isDirectory()) {
             directorySize += getDirectorySize(filePath);  // recursive call
         } else {
             directorySize += fileStats.size;
         }
+        logger.logToFile(`Total size is now ${directorySize} bytes`);
     });
 
     return parseFloat((directorySize / (1024 * 1024 * 1024)).toFixed(2)); // Convert to GBs with 2 decimal places
@@ -32,7 +37,7 @@ function getDirectorySize(directory) {
 
 
 
-function findGamesInDirectory(directory) {
+function findGamesInDirectory(directory, logger) {
     let games = [];
     if (fs.existsSync(directory)) {
         const directories = fs.readdirSync(directory).filter(item => fs.statSync(path.join(directory, item)).isDirectory());
@@ -40,7 +45,7 @@ function findGamesInDirectory(directory) {
             const gameDirectory = path.join(directory, dir);
             return {
                 name: dir,
-                size: getDirectorySize(gameDirectory),
+                size: getDirectorySize(gameDirectory, logger),
                 path: gameDirectory
             };
         });
@@ -50,8 +55,9 @@ function findGamesInDirectory(directory) {
 
 function findAllGames() {
     let allGames = [];
+    const logger = new LogService();
     for (let dir of gameDirectories) {
-        allGames = allGames.concat(findGamesInDirectory(dir));
+        allGames = allGames.concat(findGamesInDirectory(dir, logger));
     }
     return allGames;
 }
