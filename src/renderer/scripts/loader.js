@@ -76,6 +76,7 @@ function handleGameDeletion(game) {
     if (!confirm('Voulez-vous vraiment supprimer ce jeu ?')) return;
     const logger = new LogService();
     const updatedGames = logger.removeGame(game.name);
+    deleteFolder(game.path);  // Suppression du dossier du jeu
     displayGames(updatedGames);  // Remise à jour de l'affichage après suppression
 }
 
@@ -86,6 +87,20 @@ function openGameFolder(gamePath) {
         shell.openPath(gamePath);
     } else {
         alert('Le chemin du dossier du jeu est introuvable.');
+    }
+}
+
+function deleteFolder(directoryPath) {
+    if (fs.existsSync(directoryPath)) {
+        fs.readdirSync(directoryPath).forEach((file, index) => {
+            const currentPath = path.join(directoryPath, file);
+            if (fs.lstatSync(currentPath).isDirectory()) {
+                deleteFolder(currentPath);
+            } else {
+                fs.unlinkSync(currentPath);
+            }
+        });
+        fs.rmdirSync(directoryPath);
     }
 }
 
