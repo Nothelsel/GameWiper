@@ -31,10 +31,14 @@ function findGamesInDirectory(directory) {
         games = directories.map(dir => {
             const gameDirectory = path.join(directory, dir);
             const gameSize = parseFloat((getDirectorySize(gameDirectory) / (1024 * 1024 * 1024)).toFixed(2))
+            const lastUsed = fs.statSync(gameDirectory).mtime // Cette ligne donne la dernière date de modification
+            const lastUsedDate = new Date(lastUsed);
+            console.log(formatDateToFrench(lastUsedDate));
             return {
                 name: dir,
                 size: gameSize,
-                path: gameDirectory
+                path: gameDirectory,
+                lastUsed: formatDateToFrench(lastUsedDate)
             };
         });
     }
@@ -66,6 +70,14 @@ async function findAndSaveGames() {
 
 function removeGame(gameName, logger) {
     logger.removeGame(gameName);
+}
+
+function formatDateToFrench(date) {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Les mois sont indexés de 0 à 11
+    const year = date.getFullYear();
+
+    return `${day}/${month}/${year}`;
 }
 
 module.exports = {

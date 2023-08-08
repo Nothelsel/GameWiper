@@ -41,6 +41,7 @@ function createGameListItem(game) {
     gameItem.classList.add('game-card');
 
     gameItem.appendChild(createGameDetailElement(game.name, 'name'));
+    if(game.lastUsed) gameItem.appendChild(createGameDetailElement(game.lastUsed, 'lastUsed'));
     gameItem.appendChild(createGameDetailElement(game.size, 'size'));
     gameItem.appendChild(createButton('../../assets/img/folder.svg', 'Ouvrir le dossier', 'folder-btn', () => openGameFolder(game.path)));
     gameItem.appendChild(createButton('../../assets/img/delete.svg', 'Supprimer', 'delete-btn', () => handleGameDeletion(game)));
@@ -50,7 +51,7 @@ function createGameListItem(game) {
 
 function createGameDetailElement(content, type) {
     const element = document.createElement('span');
-
+    
     switch (type) {
         case 'name':
             element.textContent = content;
