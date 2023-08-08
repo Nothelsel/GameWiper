@@ -33,7 +33,6 @@ function findGamesInDirectory(directory) {
             const gameSize = parseFloat((getDirectorySize(gameDirectory) / (1024 * 1024 * 1024)).toFixed(2))
             const lastUsed = fs.statSync(gameDirectory).mtime // Cette ligne donne la dernière date de modification
             const lastUsedDate = new Date(lastUsed);
-            console.log(formatDateToFrench(lastUsedDate));
             return {
                 name: dir,
                 size: gameSize,

@@ -5,7 +5,7 @@ const findAllGameFolders = require('./folderScanner');
 
 let mainWindow;
 
-async function createWindow() {
+function createWindow() {
     mainWindow = new BrowserWindow({
         width: 800,
         height: 600,
@@ -22,9 +22,6 @@ async function createWindow() {
     });
 
     mainWindow.webContents.openDevTools();
-
-    const allGamePaths = await findAllGameFolders();
-    console.log(allGamePaths);
     // Vérifiez si de nouveaux jeux ont été ajoutés depuis le dernier démarrage
     gameFinder.findAndSaveGames();
 }
