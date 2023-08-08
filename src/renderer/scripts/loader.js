@@ -1,9 +1,11 @@
 const fs = require('fs');
 const path = require('path');
+const LogService = require('../services/logService.js');
 
 const gamesFilePath = path.join(__dirname, '../../data/games.json');
 
 window.onload = function() {
+
     loadGamesAndDisplay();
     setupSortingHandlers();
 };
@@ -15,8 +17,9 @@ function loadGamesAndDisplay() {
 }
 
 function loadGamesFromFile() {
+    const logger = new LogService();
     try {
-        return JSON.parse(fs.readFileSync(gamesFilePath, 'utf-8'));
+        return logger.getGamesFromStorage();
     } catch (err) {
         console.error('Erreur lors de la lecture du fichier games.json:', err);
         return null;
@@ -71,12 +74,9 @@ function createButton(src, alt, className, action) {
 
 function handleGameDeletion(game) {
     if (!confirm('Voulez-vous vraiment supprimer ce jeu ?')) return;
-
-    const games = loadGamesFromFile();
-    const index = games.indexOf(game);
-    games.splice(index, 1);
-    fs.writeFileSync(gamesFilePath, JSON.stringify(games, null, 4));
-    displayGames(games);  // Remise à jour de l'affichage après suppression
+    const logger = new LogService();
+    const updatedGames = logger.removeGame(game.name);
+    displayGames(updatedGames);  // Remise à jour de l'affichage après suppression
 }
 
 function openGameFolder(gamePath) {

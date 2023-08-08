@@ -38,7 +38,7 @@ class LogService {
         const games = this.getGamesFromStorage();
         const updatedGames = games.filter(game => game.name !== gameName);
         this.fillGamesStorage(updatedGames);
-        
+        return updatedGames;
     }
 }
 
