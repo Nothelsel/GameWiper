@@ -54,3 +54,7 @@ eh
 
 # dependencies
 package-lock.json
+
+# outputs
+outputs
+outputs/*
