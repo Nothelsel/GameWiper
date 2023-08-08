@@ -2,10 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const LogService = require('../services/logService.js');
 
-const gamesFilePath = path.join(__dirname, '../../data/games.json');
-
 window.onload = function() {
-
     loadGamesAndDisplay();
     setupSortingHandlers();
 };
@@ -43,25 +40,33 @@ function createGameListItem(game) {
     const gameItem = document.createElement('li');
     gameItem.classList.add('game-card');
 
-    gameItem.appendChild(createGameNameElement(game.name));
-    gameItem.appendChild(createGameSizeElement(game.size));
+    gameItem.appendChild(createGameDetailElement(game.name, 'name'));
+    gameItem.appendChild(createGameDetailElement(game.size, 'size'));
     gameItem.appendChild(createButton('../../assets/img/folder.svg', 'Ouvrir le dossier', 'folder-btn', () => openGameFolder(game.path)));
     gameItem.appendChild(createButton('../../assets/img/delete.svg', 'Supprimer', 'delete-btn', () => handleGameDeletion(game)));
 
     return gameItem;
 }
 
-function createGameNameElement(name) {
-    const gameName = document.createElement('span');
-    gameName.textContent = name;
-    return gameName;
+function createGameDetailElement(content, type) {
+    const element = document.createElement('span');
+
+    switch (type) {
+        case 'name':
+            element.textContent = content;
+            break;
+        case 'size':
+            element.textContent = `${content} Go`;
+            break;
+        case 'lastUsed':
+            element.textContent = content;
+        default:
+            console.error('Invalid type for game detail element.');
+    }
+
+    return element;
 }
 
-function createGameSizeElement(size) {
-    const gameSize = document.createElement('span');
-    gameSize.textContent = `${size} Go`;
-    return gameSize;
-}
 
 function createButton(src, alt, className, action) {
     const btn = document.createElement('img');
